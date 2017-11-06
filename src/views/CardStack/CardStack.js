@@ -40,6 +40,7 @@ import TransitionConfigs from './TransitionConfigs';
 const emptyFunction = () => {};
 
 type Props = {
+  globalGesturesEnabled?: boolean,
   screenProps?: {},
   headerMode: HeaderMode,
   headerComponent?: React.ComponentType<*>,
@@ -69,7 +70,7 @@ type Props = {
 
 /**
  * The max duration of the card animation in milliseconds after released gesture.
- * The actual duration should be always less then that because the rest distance 
+ * The actual duration should be always less then that because the rest distance
  * is always less then the full distance of the layout.
  */
 const ANIMATION_DURATION = 500;
@@ -102,6 +103,9 @@ const animatedSubscribeValue = (animatedValue: Animated.Value) => {
 };
 
 class CardStack extends React.Component<Props> {
+  static defaultProps = {
+    globalGesturesEnabled: Platform.OS === 'ios',
+  };
   /**
    * Used to identify the starting point of the position when the gesture starts, such that it can
    * be updated according to its relative position. This means that a card can effectively be
@@ -354,10 +358,11 @@ class CardStack extends React.Component<Props> {
     });
 
     const { options } = this._getScreenDetails(scene);
+    const screenGesturesEnabled =
+      typeof options.gesturesEnabled === 'boolean' && options.gesturesEnabled;
+
     const gesturesEnabled =
-      typeof options.gesturesEnabled === 'boolean'
-        ? options.gesturesEnabled
-        : Platform.OS === 'ios';
+      this.props.globalGesturesEnabled && screenGesturesEnabled;
 
     const handlers = gesturesEnabled ? responder.panHandlers : {};
     const containerStyle = [
