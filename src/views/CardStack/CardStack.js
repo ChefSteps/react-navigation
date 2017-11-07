@@ -239,11 +239,6 @@ class CardStack extends React.Component<Props> {
     const { index } = navigation.state;
     const isVertical = mode === 'modal';
 
-    const { options } = this._getScreenDetails(scene);
-
-    const gesturesEnabled =
-      typeof options.gesturesEnabled === 'boolean' && options.gesturesEnabled;
-
     const responder = PanResponder.create({
       onPanResponderTerminate: () => {
         this._isResponding = false;
@@ -259,7 +254,7 @@ class CardStack extends React.Component<Props> {
         event: { nativeEvent: { pageY: number, pageX: number } },
         gesture: any
       ) => {
-        if (index !== scene.index || !gesturesEnabled) {
+        if (index !== scene.index) {
           return false;
         }
         // $FlowFixMe
@@ -363,6 +358,11 @@ class CardStack extends React.Component<Props> {
         });
       },
     });
+
+    const { options } = this._getScreenDetails(scene);
+
+    const gesturesEnabled =
+      typeof options.gesturesEnabled === 'boolean' && options.gesturesEnabled;
 
     const handlers =
       gesturesEnabled && Platform.OS === 'ios' ? responder.panHandlers : {};
