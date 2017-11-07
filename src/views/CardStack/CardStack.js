@@ -364,7 +364,8 @@ class CardStack extends React.Component<Props> {
       },
     });
 
-    const handlers = gesturesEnabled ? responder.panHandlers : {};
+    const handlers =
+      gesturesEnabled && Platform.OS === 'ios' ? responder.panHandlers : {};
     const containerStyle = [
       styles.container,
       this._getTransitionConfig().containerStyle,
