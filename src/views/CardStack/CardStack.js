@@ -103,9 +103,6 @@ const animatedSubscribeValue = (animatedValue: Animated.Value) => {
 };
 
 class CardStack extends React.Component<Props> {
-  static defaultProps = {
-    globalGesturesEnabled: Platform.OS === 'ios',
-  };
   /**
    * Used to identify the starting point of the position when the gesture starts, such that it can
    * be updated according to its relative position. This means that a card can effectively be
@@ -260,6 +257,11 @@ class CardStack extends React.Component<Props> {
         if (index !== scene.index) {
           return false;
         }
+        // $FlowFixMe
+        const { getIsBackNavigationEnabled } = this.props.navigation;
+        if (typeof getIsBackNavigationEnabled === 'function') {
+          if (!getIsBackNavigationEnabled()) return false;
+        }
         const immediateIndex =
           this._immediateIndex == null ? index : this._immediateIndex;
         const currentDragDistance = gesture[isVertical ? 'dy' : 'dx'];
@@ -358,13 +360,12 @@ class CardStack extends React.Component<Props> {
     });
 
     const { options } = this._getScreenDetails(scene);
-    const screenGesturesEnabled =
-      typeof options.gesturesEnabled === 'boolean' && options.gesturesEnabled;
 
     const gesturesEnabled =
-      this.props.globalGesturesEnabled && screenGesturesEnabled;
+      typeof options.gesturesEnabled === 'boolean' && options.gesturesEnabled;
 
-    const handlers = gesturesEnabled ? responder.panHandlers : {};
+    const handlers =
+      gesturesEnabled && Platform.OS === 'ios' ? responder.panHandlers : {};
     const containerStyle = [
       styles.container,
       this._getTransitionConfig().containerStyle,
